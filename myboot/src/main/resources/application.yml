@@ -2,10 +2,15 @@
 server:
     port: 8099
     
+key2: 2222222222
+    
 #导入子配置文件
 spring:
     profiles:
         include: model1,model2
+        active: dev  #多环境切换配置
+    main:
+        banner-mode: "off"  #关闭启动时的横幅
 
 #定义acme配置
 acme:

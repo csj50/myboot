@@ -35,7 +35,7 @@ public class BootTest {
 	}
 
 	@Test
-	public void TestHello() {
+	public void testHello() {
 		System.out.println("hello world...");
 		System.out.println("str is: " + str);
 		System.out.println("str2 is: " + str2);
