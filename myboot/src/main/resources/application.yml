@@ -1,0 +1,17 @@
+#启动端口
+server:
+    port: 8099
+    
+#导入子配置文件
+spring:
+    profiles:
+        include: model1,model2
+
+#定义acme配置
+acme:
+    remote-address: 192.168.1.1
+    security:
+        username: admin
+        roles:
+         - USER
+         - ADMIN
