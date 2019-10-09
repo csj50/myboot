@@ -2,6 +2,8 @@ package myboot;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,8 @@ import com.example.properties.AcmeProperties;
 @SpringBootTest(classes = MybootApplication.class)
 public class YamlTest {
 
+	protected static Logger logger = LoggerFactory.getLogger(YamlTest.class);
+	
 	@Value("${model1.name}")
 	private String str1;
 
@@ -46,5 +50,12 @@ public class YamlTest {
 	@Test
 	public void testProfiles() {
 		System.out.println("env is: " + env);
+	}
+	
+	@Test
+	public void testLog() {
+		logger.info("testLog start...");
+		logger.info("env: {}", env);
+		logger.info("testLog end...");
 	}
 }
