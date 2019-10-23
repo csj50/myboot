@@ -5,10 +5,12 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.example.domain.Student;
 import com.example.myboot.MybootApplication;
 import com.example.properties.AcmeProperties;
 
@@ -33,6 +35,10 @@ public class YamlTest {
 	@Autowired
 	private AcmeProperties acmeProperties;
 
+	@Qualifier("stu1")
+	@Autowired
+	private Student sss;
+	
 	@Test
 	public void testYaml() {
 		System.out.println("model1.name: " + str1);
@@ -57,5 +63,11 @@ public class YamlTest {
 		logger.info("testLog start...");
 		logger.info("env: {}", env);
 		logger.info("testLog end...");
+	}
+	
+	@Test
+	public void testConfiguration() {
+		System.out.println("student.name is: " + sss.getName());
+		System.out.println("student.age is: " + sss.getAge());
 	}
 }
