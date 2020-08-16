@@ -1,9 +1,13 @@
 #启动端口
 server:
     port: 8099
-    
+
+#设置随机端口
+#server:
+#    port: ${random.int[1024,9999]}
+
 key2: 2222222222
-    
+
 #导入子配置文件
 spring:
     profiles:
