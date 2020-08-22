@@ -10,8 +10,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 
-import org.springframework.core.annotation.Order;
-
 @WebFilter(filterName = "MyFilter1", urlPatterns = "/*")
 public class MyFilter1 implements Filter {
 
