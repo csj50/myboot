@@ -15,6 +15,8 @@ spring:
         active: dev  #多环境切换配置
     main:
         banner-mode: "off"  #关闭启动时的横幅
+    swagger2:
+        enabled: true
 
 #定义acme配置
 acme:
