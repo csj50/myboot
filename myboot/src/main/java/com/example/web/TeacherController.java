@@ -1,5 +1,7 @@
 package com.example.web;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +30,7 @@ public class TeacherController {
 	
 	@ApiOperation("测试方法二")
 	@PostMapping("/update")
-	public boolean update(Teacher request) {
+	public boolean update(@Valid Teacher request) {
 		//do something
 		return true;
 	}
