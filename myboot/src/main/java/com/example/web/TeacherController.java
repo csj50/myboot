@@ -2,6 +2,7 @@ package com.example.web;
 
 import javax.validation.Valid;
 
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,5 +34,12 @@ public class TeacherController {
 	public boolean update(@Valid Teacher request) {
 		//do something
 		return true;
+	}
+	
+	@ApiOperation("测试断言")
+	@GetMapping("/testAssert")
+	public void testAssert() {
+		Teacher teacher = null;
+		Assert.notNull(teacher, "对象不能为空");
 	}
 }

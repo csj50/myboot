@@ -41,4 +41,9 @@ public class GlobalExceptionHandler {
         }
 		return CommonResponse.fail("999999", sb.toString());
 	}
+	
+	@ExceptionHandler(IllegalArgumentException.class)
+	public CommonResponse illegalArgumentException(IllegalArgumentException e) {
+		return CommonResponse.fail("999999", e.getMessage());
+	}
 }
