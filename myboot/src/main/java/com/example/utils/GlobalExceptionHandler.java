@@ -16,22 +16,42 @@ import com.example.message.CommonResponse;
 @ResponseBody
 public class GlobalExceptionHandler {
 
+	/**
+	 * 运行时异常
+	 * @param e
+	 * @return
+	 */
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(RuntimeException.class)
 	public CommonResponse runtimeException(RuntimeException e) {
 		return CommonResponse.fail("999999", e.getMessage());
 	}
 	
+	/**
+	 * exception异常
+	 * @param e
+	 * @return
+	 */
 	@ExceptionHandler(Exception.class)
 	public CommonResponse exception(Exception e) {
 		return CommonResponse.fail("999999", e.getMessage());
 	}
 	
+	/**
+	 * 业务异常
+	 * @param e
+	 * @return
+	 */
 	@ExceptionHandler(BizException.class)
 	public CommonResponse bizException(BizException e) {
 		return CommonResponse.fail(e.getCode(), e.getMessage());
 	}
 	
+	/**
+	 * Valid抛的异常
+	 * @param e
+	 * @return
+	 */
 	@ExceptionHandler(BindException.class)
 	public CommonResponse bindException(BindException  e) {
 		BindingResult bindingResult = e.getBindingResult();
@@ -42,6 +62,11 @@ public class GlobalExceptionHandler {
 		return CommonResponse.fail("999999", sb.toString());
 	}
 	
+	/**
+	 * Assert抛的异常
+	 * @param e
+	 * @return
+	 */
 	@ExceptionHandler(IllegalArgumentException.class)
 	public CommonResponse illegalArgumentException(IllegalArgumentException e) {
 		return CommonResponse.fail("999999", e.getMessage());
