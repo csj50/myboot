@@ -1,2 +1,49 @@
 application:
     name: dev environment
+
+#定义数据源
+#参考 https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://localhost:3306/webapp2?serverTimezone=UTC
+        username: user2
+        password: 654321
+        filters: stat
+        maxActive: 20
+        initialSize: 1
+        maxWait: 60000
+        minIdle: 1
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxOpenPreparedStatements: 20
+        asyncInit: true
+
+#mybatis的相关配置
+mybatis:
+    #mapper配置文件
+    mapper-locations: classpath:com/create/xml/*.xml
+    #resultType默认包名
+    type-aliases-package: com.create.entity
+    #开启驼峰命名
+    configuration:
+        map-underscore-to-camel-case: true
+
+#tkMybatis配置
+mapper:
+    #配置继承后的通用DAO接口类
+    mappers: com.example.base.BaseDao
+    identity: mysql
+    
+#pagehelper分页插件
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    page-size-zero: true

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+	<context id="context1" targetRuntime="MyBatis3">
+		<commentGenerator>
+			<property name="suppressAllComments" value="true" /><!-- 取消生成的注释信息 -->
+		</commentGenerator>
+		<!-- 数据库连接信息 -->
+		<jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+			connectionURL="jdbc:mysql://localhost:3306/webapp2?serverTimezone=UTC"
+			userId="user2" password="654321" />
+		<!-- 生成实体类 -->
+		<javaModelGenerator
+			targetPackage="com.create.entity" 
+			targetProject="myboot/src/main/java" />
+		<!-- 生成mapper.xml文件 -->
+		<sqlMapGenerator targetPackage="com.create.xml"
+			targetProject="myboot/src/main/java" />
+		<!-- 生成mapper接口类 -->
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="com.create.entity" 
+			targetProject="myboot/src/main/java">
+		</javaClientGenerator>
+
+		<table tableName="tbl_%" schema="webapp2"
+			enableCountByExample="false" enableUpdateByExample="false"
+			enableDeleteByExample="false" enableSelectByExample="false"
+			selectByExampleQueryId="false">
+		</table>
+	</context>
+</generatorConfiguration>
