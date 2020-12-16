@@ -5,24 +5,33 @@ application:
 #参考 https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE
 spring:
     datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        type: com.alibaba.druid.pool.DruidDataSource
-        url: jdbc:mysql://localhost:3306/webapp2?serverTimezone=UTC
-        username: user2
-        password: 654321
-        filters: stat
-        maxActive: 20
-        initialSize: 1
-        maxWait: 60000
-        minIdle: 1
-        timeBetweenEvictionRunsMillis: 60000
-        minEvictableIdleTimeMillis: 300000
-        testWhileIdle: true
-        testOnBorrow: false
-        testOnReturn: false
-        poolPreparedStatements: true
-        maxOpenPreparedStatements: 20
-        asyncInit: true
+            druid:
+                driver-class-name: com.mysql.cj.jdbc.Driver
+                type: com.alibaba.druid.pool.DruidDataSource
+                url: jdbc:mysql://localhost:3306/webapp2?serverTimezone=UTC
+                username: user2
+                password: 654321
+                #配置监控统计拦截的filters
+                filters: stat,wall,slf4j
+                max-active: 20
+                initial-size: 1
+                max-wait: 60000
+                min-idle: 1
+                time-between-eviction-runs-millis: 60000
+                min-evictable-idle-time-millis: 300000
+                test-while-idle: true
+                test-on-borrow: false
+                test-on-return: false
+                pool-prepared-statements: true
+                max-open-prepared-statements: 20
+                async-init: true
+                filter: 
+                    slf4j: 
+                        enabled: true
+                        statement-create-after-log-enabled: false
+                        statement-close-after-log-enabled: false
+                        result-set-open-after-log-enabled: false
+                        result-set-close-after-log-enabled: false
 
 #mybatis的相关配置
 mybatis:

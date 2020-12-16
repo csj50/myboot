@@ -115,8 +115,24 @@
 		<level value="info" />
 		<appender-ref ref="catalina" />
 	</logger>
-
-
+	<!-- mybatis打印日志 -->
+	<logger name="org.apache.ibatis" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="stdout" />
+	</logger>
+ 	<logger name="org.mybatis" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="stdout" />
+	</logger>
+	<logger name="druid.sql" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="stdout" />
+	</logger>
+	<logger name="com.create.entity" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="stdout" />
+	</logger>
+	
 	<!-- root级别控制 -->
 	<root level="info">
 		<appender-ref ref="root" />
