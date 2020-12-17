@@ -16,6 +16,8 @@ import com.example.myboot.MybootApplication;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
+import tk.mybatis.mapper.entity.Example;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = MybootApplication.class)
 public class MybatisTest {
@@ -68,5 +70,23 @@ public class MybatisTest {
 			System.out.println("id is: " + tmp.getId());
 			System.out.println("name is: " + tmp.getName());
 		}
+	}
+	
+	@Test
+	public void testExample() {
+		//模拟传输对象
+		TblTeacherInf teacherDto = new TblTeacherInf();
+		teacherDto.setId(100);
+		teacherDto.setName("关羽");
+		//组建查询条件
+		Example example = new Example(TblTeacherInf.class);
+		Example.Criteria criteria = example.createCriteria();
+		criteria.andEqualTo("id", teacherDto.getId());
+		criteria.andEqualTo("name", teacherDto.getName());
+		example.setOrderByClause("id desc");
+		//查询
+		TblTeacherInf tmp = teacherMapperTk.selectOneByExample(example);
+		System.out.println("id is: " + tmp.getId());
+		System.out.println("name is: " + tmp.getName());
 	}
 }
