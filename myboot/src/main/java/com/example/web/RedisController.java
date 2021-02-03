@@ -42,4 +42,5 @@ public class RedisController {
 	public TblTeacherInf findById(Integer id) {
 		return teacherService.findById(id);
 	}
+
 }

@@ -1,8 +1,11 @@
 package com.example.service;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.create.entity.TblTeacherInf;
 import com.create.entity.TblTeacherInfMapper;
+import com.example.domain.CartCookie;
+import com.example.domain.CartUser;
+import com.example.domain.CartUserPage;
 import com.example.utils.ShortUrlGenerator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -93,5 +99,150 @@ public class RedisExampleService {
 		String oriUrl = (String)redisTemplate.opsForHash().get(key, url);
 		log.info("原始url: {}", oriUrl);
 		return oriUrl;
+	}
+	
+	/**
+	 * 登录状态下添加购物车
+	 * @param cart
+	 */
+	public void userAddCart(CartUser cart) {
+		String key = "cart:user:" + cart.getUserId();
+		Boolean hasKey = redisTemplate.opsForHash().getOperations().hasKey(key);
+		if (hasKey) {
+			//在购物车页面添加商品（包含之前数量）
+			redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+		} else {
+			//添加商品同时设置有效期
+			redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+			redisTemplate.expire(key, 30, TimeUnit.DAYS);
+		}
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 登录状态下修改购物车
+	 * @param cart
+	 */
+	public void userUpdateCart(CartUser cart) {
+		String key = "cart:user:" + cart.getUserId();
+		redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 登录状态下删除购物车商品
+	 * @param cart
+	 */
+	public void userDelCart(long userId, long productId) {
+		String key = "cart:user:" + userId;
+		redisTemplate.opsForHash().delete(key, productId);
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 查询购物车所有商品
+	 * @param userId
+	 * @return
+	 */
+	public CartUserPage<CartUser> findAll(long userId) {
+		String key = "cart:user:" + userId;
+		CartUserPage<CartUser> cartUserPage = new CartUserPage<CartUser>();
+		//查询购物车总数
+		long size = redisTemplate.opsForHash().size(key);
+		cartUserPage.setCount((int)size);
+		//查询购物车的所有商品
+		//entries等于hgetall命令
+		Map<Object, Object> map = redisTemplate.opsForHash().entries(key); //redis取出来默认是String
+		//取出来的map里，key都是string，value根据传入的类型是String、Integer、Long
+		List<CartUser> cartUserList = new ArrayList<>();
+		for(Map.Entry<Object, Object> entry : map.entrySet()) {
+			CartUser cart = new CartUser();
+			cart.setUserId(userId);
+			cart.setProductId(Long.parseLong((String)entry.getKey()));
+			cart.setNumber(((Integer)entry.getValue()).intValue());
+			cartUserList.add(cart);
+		}
+		cartUserPage.setCartList(cartUserList);
+		return cartUserPage;
+	}
+	
+	/**
+	 * 未登录状态下添加购物车
+	 * @param cart
+	 */
+	public void cookieAddCart(CartCookie cart, String cookieId) {
+		String key = "cart:cookie:" + cookieId;
+		Boolean hasKey = redisTemplate.opsForHash().getOperations().hasKey(key);
+		if (hasKey) {
+			//在购物车页面添加商品（包含之前数量）
+			redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+		} else {
+			//添加商品同时设置有效期
+			redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+			redisTemplate.expire(key, 30, TimeUnit.DAYS);
+		}
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 未登录状态下修改购物车
+	 * @param cart
+	 */
+	public void cookieUpdateCart(CartCookie cart, String cookieId) {
+		String key = "cart:cookie:" + cookieId;
+		redisTemplate.opsForHash().put(key, cart.getProductId(), cart.getNumber());
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 未登录状态下删除购物车商品
+	 * @param cart
+	 */
+	public void cookieDelCart(String productId, String cookieId) {
+		String key = "cart:cookie:" + cookieId;
+		redisTemplate.opsForHash().delete(key, productId);
+		//发送MQ异步修改数据库
+	}
+	
+	/**
+	 * 未登录状态下查询购物车所有商品
+	 * @param userId
+	 * @return
+	 */
+	public CartUserPage<CartCookie> cookieFindAll(String cookieId) {
+		String key = "cart:cookie:" + cookieId;
+		CartUserPage<CartCookie> cartUserPage = new CartUserPage<CartCookie>();
+		//查询购物车总数
+		long size = redisTemplate.opsForHash().size(key);
+		cartUserPage.setCount((int)size);
+		//查询购物车的所有商品
+		//entries等于hgetall命令
+		Map<Object, Object> map = redisTemplate.opsForHash().entries(key); //redis取出来默认是String
+		//取出来的map里，key都是String类型，value根据传入的类型是String、Integer、Long
+		List<CartCookie> cartUserList = new ArrayList<>();
+		for(Map.Entry<Object, Object> entry : map.entrySet()) {
+			CartCookie cart = new CartCookie();
+			cart.setProductId(Long.parseLong((String)entry.getKey()));
+			cart.setNumber(((Integer)entry.getValue()).intValue());
+			cartUserList.add(cart);
+		}
+		cartUserPage.setCartList(cartUserList);
+		return cartUserPage;
+	}
+	
+	/**
+	 * 合并购物车
+	 * @param userId
+	 * @param cookieId
+	 */
+	public void cookieMergeCart(long userId, String cookieId) {
+		String key = "cart:cookie:" + cookieId;
+		//第一步：获取未登录cookie的购物车数据
+		Map<Object, Object> map = redisTemplate.opsForHash().entries(key);
+		//第二步：把cookie的购物车合并到登录用户下
+		String userKey = "cart:user:" + userId;
+		redisTemplate.opsForHash().putAll(userKey, map);
+		//第三步：删除未登录cookie的购物车
+		redisTemplate.delete(key);
 	}
 }

@@ -1,6 +1,7 @@
 package com.create.entity;
 
 public class TblTeacherInf {
+	
     private Integer id;
 
     private String name;

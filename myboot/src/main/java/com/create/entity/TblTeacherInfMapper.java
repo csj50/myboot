@@ -1,8 +1,7 @@
 package com.create.entity;
 
-import com.create.entity.TblTeacherInf;
-
 public interface TblTeacherInfMapper {
+	
     int deleteByPrimaryKey(Integer id);
 
     int insert(TblTeacherInf record);
