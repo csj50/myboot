@@ -1,6 +1,7 @@
 package com.example.web;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.create.entity.TblTeacherInf;
+import com.example.domain.Product;
 import com.example.service.RedisExampleService;
 
 import io.swagger.annotations.Api;
@@ -52,5 +54,11 @@ public class RedisExampleController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@ApiOperation("查询抢购热门商品")
+	@GetMapping("/findHotProduct")
+	public List<Product> findHotProduct(int page, int size) {
+		return redisExampleService.findHotProduct(page, size);
 	}
 }

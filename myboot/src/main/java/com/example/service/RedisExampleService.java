@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.create.entity.TblTeacherInf;
 import com.create.entity.TblTeacherInfMapper;
+import com.example.base.Constants;
 import com.example.domain.CartCookie;
 import com.example.domain.CartUser;
 import com.example.domain.CartUserPage;
+import com.example.domain.Product;
 import com.example.utils.ShortUrlGenerator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -244,5 +246,39 @@ public class RedisExampleService {
 		redisTemplate.opsForHash().putAll(userKey, map);
 		//第三步：删除未登录cookie的购物车
 		redisTemplate.delete(key);
+	}
+	
+	/**
+	 * 查询抢购热门商品
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	public List<Product> findHotProduct (int page, int size) {
+		//从redis中分页查询，高并发情况下走db会把db打垮
+		List<Object> lists = null;
+		int start = (page - 1) * size; //page下标从1开始，size是每页大小
+		int end = start + size - 1;
+		
+		//lists = redisTemplate.opsForList().range(Constants.HOT_PRODUCT, start, end);
+		
+		//查询缓存A
+		lists = redisTemplate.opsForList().range(Constants.HOT_PRODUCT_A, start, end);
+		if (lists == null) {
+			//查询缓存B
+			lists = redisTemplate.opsForList().range(Constants.HOT_PRODUCT_B, start, end);
+		}
+		
+		if (lists == null) {
+			//查询db
+		}
+		
+		List<Product> products = new ArrayList<Product>();
+		for(Object obj : lists) {
+			Product p = (Product)obj;
+			products.add(p);
+		}
+		
+		return products;
 	}
 }

@@ -1,6 +1,5 @@
 package com.example.web;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
