@@ -67,3 +67,9 @@ pagehelper:
     supportMethodsArguments: true
     params: count=countSql
     page-size-zero: true
+
+#限流器QPS设置
+rateLimiter:
+    all: 1
+    resource: 100
+    interface: 1
