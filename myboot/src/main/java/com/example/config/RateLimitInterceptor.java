@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,6 +33,10 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		
+		//获取HandlerMethod对象
+		HandlerMethod h = (HandlerMethod)handler;
+		
 		//尝试获取一个令牌，带超时时间，超时时间单位为毫秒
 		if (!rateLimiterAll.tryAcquire(100, TimeUnit.MICROSECONDS)) {
 			logger.info("全局限流器限流中...");
@@ -44,6 +49,37 @@ public class RateLimitInterceptor implements HandlerInterceptor {
 		} else {
 			logger.info("全局限流器通过...");
 		}
+		
+		//resource限流器
+		if (h.getBean().getClass().getSimpleName().equals("MyController")) {
+			if (!rateLimiterResource.tryAcquire(100, TimeUnit.MICROSECONDS)) {
+				logger.info("resource限流器限流中...");
+				response.setCharacterEncoding("UTF-8");
+				response.setHeader("Content-Type", "text/html; charset=UTF-8");
+				response.getWriter().write("{\"data\":\"访问次数受限\",\"sign\":null,\"repCode\":\"999999\",\"repMsg\":\"失败\"}");
+				response.getWriter().flush();
+				response.getWriter().close();
+				return false;
+			} else {
+				logger.info("resource限流器通过...");
+			}
+		}
+		
+		//接口限流器
+		if(h.getMethod().getName().equals("hello")) {
+			if (!rateLimiterIngerface.tryAcquire(100, TimeUnit.MICROSECONDS)) {
+				logger.info("接口限流器限流中...");
+				response.setCharacterEncoding("UTF-8");
+				response.setHeader("Content-Type", "text/html; charset=UTF-8");
+				response.getWriter().write("{\"data\":\"访问次数受限\",\"sign\":null,\"repCode\":\"999999\",\"repMsg\":\"失败\"}");
+				response.getWriter().flush();
+				response.getWriter().close();
+				return false;
+			} else {
+				logger.info("接口限流器通过...");
+			}
+		}
+		
 		return HandlerInterceptor.super.preHandle(request, response, handler);
 	}
 	
