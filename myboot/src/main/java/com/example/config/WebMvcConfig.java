@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -26,7 +27,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		// 要注意这里使用this.rateLimitInterceptor()
 		InterceptorRegistration registration = registry.addInterceptor(this.rateLimitInterceptor());
 		// 所有路径都被拦截
-		registration.addPathPatterns("/**");
+		registration.addPathPatterns("/**")
+		.excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**","doc.html","/error");
 		WebMvcConfigurer.super.addInterceptors(registry);
 	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("swagger-ui.html", "doc.html")
+				.addResourceLocations("classpath:/META-INF/resources/");
+		registry.addResourceHandler("/webjars/**")
+				.addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+	}
+
 }

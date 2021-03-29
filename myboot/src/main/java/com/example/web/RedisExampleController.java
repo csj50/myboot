@@ -61,4 +61,16 @@ public class RedisExampleController {
 	public List<Product> findHotProduct(int page, int size) {
 		return redisExampleService.findHotProduct(page, size);
 	}
+	
+	@ApiOperation("包红包接口")
+	@GetMapping("/setRedPacket")
+	public String setRedPacket(double total, int count) {
+		return redisExampleService.setRedPacket(total, count);
+	}
+	
+	@ApiOperation("抢红包接口")
+	@GetMapping("/robRedPacket")
+	public String robRedPacket(String redPacketId, String userId) {
+		return redisExampleService.robRedPacket(redPacketId, userId);
+	}
 }

@@ -18,6 +18,7 @@ import com.example.domain.CartCookie;
 import com.example.domain.CartUser;
 import com.example.domain.CartUserPage;
 import com.example.domain.Product;
+import com.example.utils.RedPacketUtil;
 import com.example.utils.ShortUrlGenerator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -260,6 +261,7 @@ public class RedisExampleService {
 		int start = (page - 1) * size; //page下标从1开始，size是每页大小
 		int end = start + size - 1;
 		
+		//防止缓存击穿，使用下面两块缓存
 		//lists = redisTemplate.opsForList().range(Constants.HOT_PRODUCT, start, end);
 		
 		//查询缓存A
@@ -280,5 +282,56 @@ public class RedisExampleService {
 		}
 		
 		return products;
+	}
+	
+	/**
+	 * 包红包接口
+	 * @param total
+	 * @param count
+	 * @return
+	 */
+	public String setRedPacket(double total, int count) {
+		//红包大key的前缀
+		String red_packet_key = "redpacket:";
+		//拆解红包
+		Double[] packet = RedPacketUtil.splitRedPacket(total, count);
+		String redPacketId = RedPacketUtil.incrementId();
+		String key = red_packet_key + redPacketId;
+		//存入redis
+		redisTemplate.opsForList().leftPushAll(key, packet);
+		//设置3天过期
+		redisTemplate.expire(key, 3, TimeUnit.DAYS);
+		log.info("拆解红包{}={}", key, packet);
+		return redPacketId;
+	}
+	
+	/**
+	 * 抢红包接口
+	 * @param redPacketId
+	 * @param userId
+	 * @return
+	 */
+	public String robRedPacket(String redPacketId, String userId) {
+		//红包大key的前缀
+		String red_packet_key = "redpacket:";
+		//红包消费大key的前缀
+		String red_packet_consume_key = "redpacket:consume:";
+		//第一步：验证用户是否抢过
+		Object packet = redisTemplate.opsForHash().get(red_packet_consume_key + redPacketId, userId);
+		if (packet == null) {
+			//第二步：从list队列弹出一个红包
+			Object obj = redisTemplate.opsForList().leftPop(red_packet_key + redPacketId);
+			if (obj == null) {
+				return "红包已抢完";
+			} else {
+				//第三步：把用户抢红包的记录存起来
+				redisTemplate.opsForHash().put(red_packet_consume_key + redPacketId, userId, obj);
+				log.info("用户{}抢到{}", userId, obj);
+				//TODO: 异步把数据落地到数据库上
+				return String.valueOf((Double)obj);
+			}
+		} else {
+			return "用户已抢过红包";
+		}
 	}
 }
