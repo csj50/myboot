@@ -342,8 +342,8 @@ public class RedisExampleService {
 	 */
 	public String viewPV(Integer id) {
 		String key = Constants.CACHE_PV_ARTICLE + id;
-		String num = (String)redisTemplate.opsForValue().get(key);
+		Integer num = (Integer) redisTemplate.opsForValue().get(key);
 		log.info("key={},阅读量为={}", key, num);
-		return num;
+		return String.valueOf(num);
 	}
 }
