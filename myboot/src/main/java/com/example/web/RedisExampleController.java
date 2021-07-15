@@ -73,4 +73,10 @@ public class RedisExampleController {
 	public String robRedPacket(String redPacketId, String userId) {
 		return redisExampleService.robRedPacket(redPacketId, userId);
 	}
+	
+	@ApiOperation("查看文章浏览量")
+	@GetMapping("/viewPV")
+	public String viewPV(Integer id) {
+		return redisExampleService.viewPV(id);
+	}
 }

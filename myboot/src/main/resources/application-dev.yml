@@ -34,7 +34,7 @@ spring:
                         result-set-close-after-log-enabled: false
     redis:
         database: 0
-        host: 192.168.102.63
+        host: 173.254.202.227
         port: 10079
         password: 123_12345678^_00
         lettuce:

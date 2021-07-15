@@ -334,4 +334,16 @@ public class RedisExampleService {
 			return "用户已抢过红包";
 		}
 	}
+	
+	/**
+	 * 返回文章浏览量
+	 * @param id
+	 * @return
+	 */
+	public String viewPV(Integer id) {
+		String key = Constants.CACHE_PV_ARTICLE + id;
+		String num = (String)redisTemplate.opsForValue().get(key);
+		log.info("key={},阅读量为={}", key, num);
+		return num;
+	}
 }
