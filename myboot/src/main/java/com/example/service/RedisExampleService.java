@@ -5,10 +5,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Metrics;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import com.create.entity.TblTeacherInf;
@@ -18,8 +27,10 @@ import com.example.domain.CartCookie;
 import com.example.domain.CartUser;
 import com.example.domain.CartUserPage;
 import com.example.domain.Product;
+import com.example.domain.Ranking;
 import com.example.utils.RedPacketUtil;
 import com.example.utils.ShortUrlGenerator;
+import com.google.common.collect.Maps;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +42,8 @@ public class RedisExampleService {
 	TblTeacherInfMapper teacherMapper;
 
 	@Autowired
-	RedisTemplate<Object, Object> redisTemplate; // 初始化泛型防止警告提示
+	//RedisTemplate<Object, Object> redisTemplate; // 初始化泛型防止警告提示
+	RedisTemplate redisTemplate;
 	
 	public void incr(Integer id) {
 		String key = "article:" + id;
@@ -345,5 +357,313 @@ public class RedisExampleService {
 		Integer num = (Integer) redisTemplate.opsForValue().get(key);
 		log.info("key={},阅读量为={}", key, num);
 		return String.valueOf(num);
+	}
+	
+	/**
+	 * 黑名单校验器
+	 * @param userId
+	 * @return
+	 */
+	public boolean isBlackList(Integer userId) {
+		boolean bo = false;
+		try {
+			bo = redisTemplate.opsForSet().isMember(Constants.BLACKLIST_KEY, userId);
+			log.info("查询结果：{}", bo);
+		} catch (Exception ex) {
+			log.error("exception:",ex);
+			//TODO: 走DB查询
+		}
+		return bo;
+	}
+	
+	/**
+	 * 抽奖
+	 * @return
+	 */
+	public String prize() {
+		String result = "";
+		//随机抽取1次
+		String str = (String)redisTemplate.opsForSet().randomMember(Constants.PRIZE_KEY);
+		if (null != str) {
+			//截取序列号
+			int temp = str.indexOf('-');
+			int no = Integer.valueOf(str.substring(0, temp));
+			switch (no) {
+				case 0:
+					result = "谢谢参与";
+					break;
+				case 1:
+					result = "获得1个金币";
+					break;
+				case 5:
+					result = "获得5个金币";
+					break;
+				case 10:
+					result = "获得10个金币";
+					break;
+				default:
+					result = "谢谢参与";
+			}
+		}
+		log.info("查询结果：{}", result);
+		return result;
+	}
+	
+	/**
+	 * 天天抽奖
+	 * @param num
+	 * @return
+	 */
+	public List<Integer> ttPrize(int num) {
+		SetOperations setOperations = redisTemplate.opsForSet();
+		List<Integer> lists = setOperations.pop(Constants.TT_PRIZE_KEY, num);
+		log.info("查询结果：{}", lists);
+		return lists;
+	}
+	
+	/**
+	 * 随机推荐群
+	 * @return
+	 */
+	public List<String> qunRandom() {
+		List<String> lists = null;
+		try {
+			//采用redis set数据结构，随机取出10条数据
+			SetOperations setOperations = redisTemplate.opsForSet();
+			lists = setOperations.randomMembers(Constants.QUN_RANDOM_KEY, 5);
+			//以下这样写会报类型转换错误
+			//lists = redisTemplate.opsForSet().randomMembers(Constants.QUN_RANDOM_KEY, 5);
+			log.info("查询结果：{}", lists);
+		} catch (Exception ex) {
+			//这里的异常，一般是redis瘫痪，或redis网络timeout
+			log.error("exception:{}", ex);
+			//TODO: 走DB查询
+		}
+		return lists;
+	}
+	
+	/**
+	 * 榜单推荐
+	 * @return
+	 */
+	public Ranking ranking() {
+		Ranking ranking = null;
+		try {
+			//随机取一块数据
+			SetOperations setOperations = redisTemplate.opsForSet();
+			ranking = (Ranking)setOperations.randomMember(Constants.RANKING_LIST);
+			log.info("查询结果：{}", ranking);
+		} catch (Exception ex) {
+			log.error("exception:", ex);
+			//TODO: 走DB查询
+		}
+		return ranking;
+	}
+	
+	/**
+	 * 点赞功能
+	 * @param postId
+	 * @param userId
+	 * @return
+	 */
+	public String doLike(int postId, int userId) {
+		String result = "";
+		try {
+			String key = Constants.LIKE_KEY + postId;
+			Long flag = redisTemplate.opsForSet().add(key, userId);
+			if (1 == flag) {
+				result = "点赞成功";
+			} else {
+				result = "你已重复点赞";
+			}
+			log.info("查询结果：{}", flag);
+		} catch (Exception ex) {
+			log.error("exception:{}", ex);
+			//TODO: 查询数据库
+		}
+		return result;
+	}
+	
+	/**
+	 * 取消点赞功能
+	 * @param postId
+	 * @param userId
+	 * @return
+	 */
+	public String undoLike(int postId, int userId) {
+		String result = "";
+		try {
+			String key = Constants.LIKE_KEY + postId;
+			Long flag = redisTemplate.opsForSet().remove(key, userId);
+			if (1 == flag) {
+				result = "取消成功";
+			} else {
+				result = "您已重复取消点赞";
+			}
+			log.info("查询结果：{}", flag);
+		} catch (Exception ex) {
+			log.error("exception:{}", ex);
+			//TODO: 查询数据库
+		}
+		return result;
+	}
+	
+	/**
+	 * 根据postId，userId查看点赞
+	 * @param postId
+	 * @param userId
+	 * @return
+	 */
+	public Map getPostLikeInfo(int postId, int userId) {
+		Map map = new HashMap();
+		try {
+			String key = Constants.LIKE_KEY + postId;
+			Long size = redisTemplate.opsForSet().size(key);
+			Boolean bo = redisTemplate.opsForSet().isMember(key, userId);
+			//点赞总数
+			map.put("size", size);
+			//是否点赞
+			map.put("isLike", bo);
+			log.info("查询结果：{}", map);
+		} catch (Exception ex) {
+			log.error("exception:{}", ex);
+			//TODO: 查询数据库
+		}
+		return map;
+	}
+	
+	/**
+	 * 查看点赞明细
+	 * @param postId
+	 * @return
+	 */
+	public Set getLikeDetail(int postId) {
+		Set set = null;
+		try {
+			String key = Constants.LIKE_KEY + postId;
+			set = redisTemplate.opsForSet().members(key);
+			log.info("查询结果：{}", set);
+		} catch (Exception ex) {
+			log.error("exception:{}", ex);
+			//TODO: 查询数据库
+		}
+		return set;
+	}
+	
+	/**
+	 * 排行榜按小时
+	 * @return
+	 */
+	public Set getHour() {
+		long hour = System.currentTimeMillis() / (1000 * 60 * 60);
+		//从key中返回30个元素
+		//zrevrange命令
+		Set<ZSetOperations.TypedTuple<Object>>  rang = redisTemplate.opsForZSet().reverseRangeWithScores(Constants.HOUR_KEY + hour, 0, 30);
+		return rang;
+	}
+	
+	/**
+	 * 排行榜按天
+	 * @return
+	 */
+	public Set getDay() {
+		//从key中返回30个元素
+		Set<ZSetOperations.TypedTuple<Object>>  rang = redisTemplate.opsForZSet().reverseRangeWithScores(Constants.DAY_KEY, 0, 30);
+		return rang;
+	}
+	
+	/**
+	 * 排行榜按周
+	 * @return
+	 */
+	public Set getWeek() {
+		//从key中返回30个元素
+		Set<ZSetOperations.TypedTuple<Object>>  rang = redisTemplate.opsForZSet().reverseRangeWithScores(Constants.WEEK_KEY, 0, 30);
+		return rang;
+	}
+	
+	/**
+	 * 排行榜按月
+	 * @return
+	 */
+	public Set getMonth() {
+		//从key中返回30个元素
+		Set<ZSetOperations.TypedTuple<Object>>  rang = redisTemplate.opsForZSet().reverseRangeWithScores(Constants.MONTH_KEY, 0, 30);
+		return rang;
+	}
+	
+	/**
+	 * geo功能初始化
+	 */
+	public void geoInit() {
+		Map<String, Point> map = Maps.newHashMap();
+		map.put("天门山森林公园", new Point(115.99956025097654, 39.8807058838189));
+		map.put("白洋淀景区", new Point(115.98857392285154, 38.94226425604525));
+		map.put("封龙山风景区", new Point(114.31453217480467, 37.902432972682355));
+		map.put("平遥古城", new Point(112.18318451855467, 37.20457037066391));
+		map.put("六盘山国家森林公园", new Point(106.32129181835936, 35.382832693671894));
+		map.put("九寨沟景区", new Point(103.91940583203123, 33.183475692241416));
+		redisTemplate.opsForGeo().add(Constants.SCENERY_KEY, map); //GEOADD命令
+	}
+	
+	/**
+	 * 获取经纬度坐标
+	 * @param member
+	 * @return
+	 */
+	public Point geoPosition(String member) {
+		List<Point> lists = redisTemplate.opsForGeo().position(Constants.SCENERY_KEY, member); //GEOPOS命令
+		return lists.get(0);
+	}
+	
+	/**
+	 * geohash算法生成base32编码值
+	 * @param member
+	 * @return
+	 */
+	public String geoHash(String member) {
+		List<String> lists = redisTemplate.opsForGeo().hash(Constants.SCENERY_KEY, member); //GEOHASH命令
+		return lists.get(0);
+	}
+	
+	/**
+	 * geo获取两个成员之间的距离
+	 * @param member1
+	 * @param member2
+	 * @return
+	 */
+	public Distance geoDistance(String member1, String member2) {
+		Distance distance = redisTemplate.opsForGeo().distance(Constants.SCENERY_KEY, member1, member2, RedisGeoCommands.DistanceUnit.KILOMETERS);
+		return distance;
+	}
+	
+	/**
+	 * geo根据经纬度查找附近的内容
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public GeoResults geoRadiusByXY(double x, double y, double distance) {
+		Point point = new Point(x, y);
+		Distance dist = new Distance(distance, Metrics.KILOMETERS);
+		//坐标
+		Circle circle = new Circle(point, dist);
+		//返回50条
+		RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().includeCoordinates().limit(50);
+		GeoResults geoResults = redisTemplate.opsForGeo().radius(Constants.SCENERY_KEY, circle, args);
+		return geoResults;
+	}
+	
+	/**
+	 * geo根据成员查找附近的内容
+	 * @param member
+	 * @return
+	 */
+	public GeoResults geoRadiusByMember(String member, double distance) {
+		//返回50条
+		RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().includeCoordinates().limit(50);
+		Distance dist = new Distance(distance, Metrics.KILOMETERS);
+		GeoResults geoResults = redisTemplate.opsForGeo().radius(Constants.SCENERY_KEY, member, dist, args);
+		return geoResults;
 	}
 }

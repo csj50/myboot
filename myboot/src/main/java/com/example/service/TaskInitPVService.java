@@ -23,7 +23,7 @@ public class TaskInitPVService {
 	/**
 	 * 初始化启动线程
 	 */
-	@PostConstruct
+	//@PostConstruct //注释不运行，防止访问redis太频繁
 	public void initPVTask() {
 		log.info("启动模拟大量PV请求 定时器..........");
 		new Thread(()->runTask()).start();
