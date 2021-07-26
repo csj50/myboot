@@ -32,17 +32,32 @@ spring:
                         statement-close-after-log-enabled: false
                         result-set-open-after-log-enabled: false
                         result-set-close-after-log-enabled: false
+#redis单机配置
+#    redis:
+#        database: 0
+#        host: 173.254.202.227
+#        port: 10079
+#        password: 123_12345678^_00
+#        lettuce:
+#            pool:
+#                max-active: 16 #连接池最大连接数（使用负值表示没有限制）
+#                max-idle: 8 #连接池中的最大空闲连接
+#                max-wait: 100ms #连接池最大阻塞等待时间（使用负值表示没有限制）
+#                min-idle: 4 #连接池中的最小空闲连接
+
+#redis集群配置
     redis:
         database: 0
-        host: 173.254.202.227
-        port: 10079
-        password: 123_12345678^_00
+        password: 
+        cluster:
+            #加入所有redis节点
+            nodes: 72.19.12.191:6381,72.19.12.191:6382,72.19.12.191:6383,72.19.12.191:6384,72.19.12.191:6385,72.19.12.191:6386
         lettuce:
             pool:
-                max-active: 16 #连接池最大连接数（使用负值表示没有限制）
-                max-idle: 8 #连接池中的最大空闲连接
-                max-wait: 100ms #连接池最大阻塞等待时间（使用负值表示没有限制）
-                min-idle: 4 #连接池中的最小空闲连接
+                max-active: 16
+                max-idle: 32
+                max-wait: -1
+                min-idle: 8
 
 #mybatis的相关配置
 mybatis:
