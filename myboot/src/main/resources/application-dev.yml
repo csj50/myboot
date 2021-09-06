@@ -88,3 +88,9 @@ rateLimiter:
     all: 1
     resource: 100
     interface: 1
+
+#自定义starter包
+sms:
+    properties:
+        timeout: 1000
+        retry: 6

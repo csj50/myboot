@@ -110,6 +110,12 @@
 			<artifactId>guava</artifactId>
 			<version>30.1-jre</version>
 		</dependency>
+		<!-- 自定义starter包 -->
+		<dependency>
+			<groupId>com.example</groupId>
+			<artifactId>sms-spring-boot-starter</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
