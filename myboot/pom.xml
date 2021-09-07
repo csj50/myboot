@@ -143,7 +143,38 @@
 							<mainClass>com.example.myboot.MybootApplication</mainClass>
 						</manifest>
 					</archive>
+					<!-- 排除target/classes下的config目录 -->
+					<excludes>
+						<exclude>config/**</exclude>
+					</excludes>
 				</configuration>
+			</plugin>
+
+			<!-- 拷贝src/main/resources下的配置文件到target/classes/config目录下，这样本地和junit能跑起来 -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-config</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/classes/config</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<includes>
+										<include>*.yml</include>
+										<include>*.properties</include>
+										<include>*.xml</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 			<!-- 拷贝依赖到jar外面的lib目录 -->
@@ -224,8 +255,8 @@
 					<exclude>*.yml</exclude>
 					<exclude>*.properties</exclude>
 					<exclude>*.xml</exclude>
-					<exclude>generator/*</exclude>
-					<exclude>assembly/*</exclude>
+					<exclude>generator/**</exclude>
+					<exclude>assembly/**</exclude>
 				</excludes>
 			</resource>
 			<!-- 读取webapp下的静态文件 -->
