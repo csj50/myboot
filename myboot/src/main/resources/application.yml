@@ -26,3 +26,7 @@ acme:
         roles:
          - USER
          - ADMIN
+
+#配置外部logback.xml
+logging:
+    config: config/logback.xml
