@@ -28,7 +28,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		InterceptorRegistration registration = registry.addInterceptor(this.rateLimitInterceptor());
 		// 所有路径都被拦截
 		registration.addPathPatterns("/**")
-		.excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**","doc.html","/error");
+		//排除拦截swagger页面
+		.excludePathPatterns("/swagger-resources/**", "/webjars/**", "/v2/**", "/swagger-ui.html/**","doc.html","/error")
+		//排除拦截webapp目录下的jsp和html页面
+		.excludePathPatterns("/*.jsp", "/*.html");
 		WebMvcConfigurer.super.addInterceptors(registry);
 	}
 

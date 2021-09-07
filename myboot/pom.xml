@@ -85,7 +85,7 @@
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
 			<version>1.2.13</version>
 		</dependency>
-		<!--redis启动器-->
+		<!--redis启动器 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -121,14 +121,80 @@
 	<build>
 		<plugins>
 			<!-- 打包成jar的插件,项目可用java -jar xxx.jar运行 -->
+			<!-- 
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			<!-- <plugin> 
-			<groupId>org.apache.maven.plugins</groupId> 
-			<artifactId>maven-jar-plugin</artifactId> 
-				</plugin> -->
+			 -->
+
+			<!-- 打包时分离程序和依赖包 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<!--是否要把第三方jar放到manifest.mf的classpath中 -->
+							<addClasspath>true</addClasspath>
+							<!--生成的manifest.mf中classpath的前缀，因为要把第三方jar放到lib目录下，所以classpath的前缀是lib/ -->
+							<classpathPrefix>lib/</classpathPrefix>
+							<!-- 执行的主程序路径 -->
+							<mainClass>com.example.myboot.MybootApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- 拷贝依赖到jar外面的lib目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-lib</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<!-- 输出路径 -->
+							<outputDirectory>target/lib</outputDirectory>
+							<!-- 排除传递依赖 -->
+							<excludeTransitive>false</excludeTransitive>
+							<!-- 复制的jar文件是否去掉版本信息 -->
+							<stripVersion>false</stripVersion>
+							<!-- 包含scope的范围 -->
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- 将配置文件复制到config目录下，然后将程序、lib目录、config目录，打成zip压缩包 -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<!-- 打包后的包名是否包含assembly的id名 -->
+					<appendAssemblyId>false</appendAssemblyId>
+					<!-- 引用的assembly配置文件 -->
+					<descriptors>
+						<descriptor>src/main/resources/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<!-- 绑定到package生命周期阶段上 -->
+						<phase>package</phase>
+						<!-- 运行一次 -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- idea下有用 -->
 			<plugin>
 				<groupId>org.mybatis.generator</groupId>
@@ -148,10 +214,19 @@
 				</dependencies>
 			</plugin>
 		</plugins>
+
 		<resources>
 			<!-- 打包加入资源文件 -->
 			<resource>
 				<directory>src/main/resources</directory>
+				<!-- 资源独立出来，打包时排除这些配置文件类型和resources下的其他目录 -->
+				<excludes>
+					<exclude>*.yml</exclude>
+					<exclude>*.properties</exclude>
+					<exclude>*.xml</exclude>
+					<exclude>generator/*</exclude>
+					<exclude>assembly/*</exclude>
+				</excludes>
 			</resource>
 			<!-- 读取webapp下的静态文件 -->
 			<resource>
