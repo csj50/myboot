@@ -8,6 +8,7 @@
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
 	<fileSets>
+		<!-- 将代码目录/src/main/resources下的文件，复制到输出目录的config内 -->
 		<fileSet>
 			<directory>${basedir}/src/main/resources</directory>
 			<includes>
@@ -18,6 +19,7 @@
 			<filtered>true</filtered>
 			<outputDirectory>${file.separator}config</outputDirectory>
 		</fileSet>
+		<!-- 将构建目录/lib下的文件，复制到输出目录的lib内 -->
 		<fileSet>
 			<directory>${project.build.directory}/lib</directory>
 			<outputDirectory>${file.separator}lib</outputDirectory>
@@ -25,6 +27,7 @@
 				<include>*.jar</include>
 			</includes>
 		</fileSet>
+		<!-- 将构建目录根目录下的jar包，复制到输出目录的根目录下 -->
 		<fileSet>
 			<directory>${project.build.directory}</directory>
 			<outputDirectory>${file.separator}</outputDirectory>

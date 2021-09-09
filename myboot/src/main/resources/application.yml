@@ -30,8 +30,3 @@ acme:
 #配置外部logback.xml
 logging:
     config: classpath:./config/logback.xml
-
-#服务器部署用以下配置
-#file在ide中是项目根目录，在执行jar文件时就是其本身目录
-#logging:
-#    config: file:./config/logback.xml
