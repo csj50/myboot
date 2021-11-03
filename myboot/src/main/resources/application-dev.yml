@@ -32,6 +32,25 @@ spring:
                         statement-close-after-log-enabled: false
                         result-set-open-after-log-enabled: false
                         result-set-close-after-log-enabled: false
+#邮件发送
+    mail:
+      username: xxx@xxx.com
+      password: 123456
+      host: smtp.exmail.qq.com
+      port: 465
+      properties:
+        mail:
+          transport:
+            protocol: smtp
+          smtp:
+            socketFactory:
+              class: javax.net.ssl.SSLSocketFactory
+            port: ${spring.mail.port}
+            auth: true
+            starttls:
+              enable: true
+              required: true
+
 #redis单机配置
 #    redis:
 #        database: 0
@@ -94,3 +113,11 @@ sms:
     properties:
         timeout: 1000
         retry: 6
+
+#test对账结果通知邮箱地址
+test:
+  mail:
+    #发件人邮箱
+    from: aaa@aaa.com
+    #收件人邮箱（支持同时发多个，用分号分隔）
+    to: bbb@bbb.com
