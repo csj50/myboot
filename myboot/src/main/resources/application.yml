@@ -30,3 +30,11 @@ acme:
 #配置外部logback.xml
 logging:
     config: classpath:./config/logback.xml
+
+#加密所需的salt(盐)
+jasypt:
+    encryptor:
+        password: AD42F6697B035B7580E4FEF93BE20BAD
+        #加密算法设置3.0.0以后
+        algorithm: PBEWithMD5AndDES
+        iv-generator-classname: org.jasypt.iv.NoIvGenerator
