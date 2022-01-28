@@ -33,6 +33,18 @@ spring:
                         statement-close-after-log-enabled: false
                         result-set-open-after-log-enabled: false
                         result-set-close-after-log-enabled: false
+                    stat: 
+                        enabled: true
+                #合并多个DruidDataSource的监控数据（多数据源时用）
+                #use-global-data-source-stat: true
+                #配置监控用户和密码以及访问ip
+                stat-view-servlet:
+                    #默认关闭了监控页面
+                    enabled: true 
+                    login-username: admin
+                    login-password: admin
+                    allow: 127.0.0.1
+
 #邮件发送
     mail:
       username: xxx@xxx.com
