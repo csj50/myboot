@@ -1,6 +1,20 @@
 #启动端口
 server:
     port: 8099
+    ssl:
+        enabled: true
+        #证书的路径
+        key-store: classpath:saas.p12
+        #证书密码
+        key-store-password: 123456
+        #秘钥库类型
+        key-store-type: PKCS12
+        #SSL协议
+        protocol: TLS
+        #使用TLS 1.2
+        enabled-protocols: TLSv1.2
+        #证书别名
+        key-alias: saas
 
 #设置随机端口
 #server:

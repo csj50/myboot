@@ -15,6 +15,7 @@
 				<include>*.yml</include>
 				<include>*.properties</include>
 				<include>*.xml</include>
+				<include>*.p12</include>
 			</includes>
 			<filtered>true</filtered>
 			<outputDirectory>${file.separator}config</outputDirectory>

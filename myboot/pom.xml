@@ -180,6 +180,7 @@
 										<include>*.yml</include>
 										<include>*.properties</include>
 										<include>*.xml</include>
+										<include>*.p12</include>
 									</includes>
 								</resource>
 							</resources>
@@ -266,6 +267,7 @@
 					<exclude>*.yml</exclude>
 					<exclude>*.properties</exclude>
 					<exclude>*.xml</exclude>
+					<exclude>*.p12</exclude>
 					<exclude>generator/**</exclude>
 					<exclude>assembly/**</exclude>
 				</excludes>
