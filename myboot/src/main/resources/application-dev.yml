@@ -65,6 +65,13 @@ spring:
               enable: true
               required: true
 
+    rabbitmq:
+        host: 72.19.12.191
+        port: 5672
+        username: admin
+        password: admin
+        virtual-host: my_vhost
+
 #redis单机配置
 #    redis:
 #        database: 0
@@ -135,3 +142,38 @@ test:
     from: aaa@aaa.com
     #收件人邮箱（支持同时发多个，用分号分隔）
     to: bbb@bbb.com
+
+#yml不允许有value的key下面一层及有value，要间隔一个空的层级
+#设置交换器
+mq:
+  config:
+    exchange: log-direct
+    exchange2: log-topic
+    exchange3: order.fanout
+    queue:
+      info: log.info
+      error: log.error
+      info2: log.info2
+      error2: log.error2
+      logs: log.msg   #全消息
+      sms: order.sms
+      push: order.push
+      routing:
+        key:
+          info: log.info.routing.key
+          error: log.error.routing.key
+          userinfo: user.log.info
+          userdebug: user.log.debug
+          userwarn: user.log.warn
+          usererror: user.log.error
+          productinfo: product.log.info
+          productdebug: product.log.debug
+          productwarn: product.log.warn
+          producterror: product.log.error
+          orderinfo: order.log.info
+          orderdebug: order.log.debug
+          orderwarn: order.log.warn
+          ordererror: order.log.error
+          
+
+
