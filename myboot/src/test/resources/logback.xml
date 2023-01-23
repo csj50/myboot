@@ -138,7 +138,7 @@
 	</logger>
 	
 	<!-- root级别控制 -->
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="root" />
 		<appender-ref ref="stdout" />
 	</root>
