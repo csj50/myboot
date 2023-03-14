@@ -1,0 +1,2 @@
+jdkspi.api.StartCommand
+jdkspi.api.ShutdownCommand
