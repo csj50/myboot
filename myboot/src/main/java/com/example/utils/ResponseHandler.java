@@ -34,6 +34,8 @@ public class ResponseHandler implements ResponseBodyAdvice<Object> {
 			return JsonUtil.obj2String(CommonResponse.succ((String)body));
 		} else if (body == null) {
 			return CommonResponse.succ();
+		} else if (body instanceof byte[]) {
+			return body; //如果是ResponseEntity<byte[]>，直接返回body，用于文件下载
 		} else {
 			//将对象转成json串
 			return CommonResponse.succ(JsonUtil.obj2String(body));

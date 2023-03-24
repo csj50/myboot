@@ -99,6 +99,12 @@ spring:
                 max-wait: -1
                 min-idle: 8
 
+#设置文件上传大小
+    servlet:
+      multipart:
+        max-file-size: 50MB
+        max-request-size: 50MB
+
 #mybatis的相关配置
 mybatis:
     #mapper配置文件
@@ -175,5 +181,9 @@ mq:
           orderwarn: order.log.warn
           ordererror: order.log.error
           
-
-
+#minio配置
+minio:
+  url: http://72.19.12.191:9998
+  access-key: VsKN1asPH1l4iNiL
+  secret-key: 6tO8VuGDxZsSBXBiakrsm4rRCRTrvHBE
+  bucket-name: test
